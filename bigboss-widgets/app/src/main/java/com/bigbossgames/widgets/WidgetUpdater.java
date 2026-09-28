@@ -1,0 +1,9 @@
+package com.bigbossgames.widgets;
+import android.app.*; import android.appwidget.*; import android.content.*; import android.os.BatteryManager; import android.widget.RemoteViews;
+public final class WidgetUpdater{
+ private WidgetUpdater(){}
+ public static void update(Context c,AppWidgetManager m,int[] ids,int layout){for(int id:ids){RemoteViews v=new RemoteViews(c.getPackageName(),layout);if(layout==R.layout.widget_battery){BatteryManager b=(BatteryManager)c.getSystemService(Context.BATTERY_SERVICE);int level=b!=null?b.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY):-1;v.setTextViewText(R.id.battery_percent,level>=0?level+"%":"—");}
+  Intent in=new Intent(c,MainActivity.class);in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);PendingIntent pi=PendingIntent.getActivity(c,layout,in,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);v.setOnClickPendingIntent(R.id.widget_root,pi);m.updateAppWidget(id,v);}}
+ public static void refreshAll(Context c){AppWidgetManager m=AppWidgetManager.getInstance(c);refresh(c,m,WidgetProviders.AmoledClock.class,R.layout.widget_amoled);refresh(c,m,WidgetProviders.ClockDate.class,R.layout.widget_clock_date);refresh(c,m,WidgetProviders.Calendar.class,R.layout.widget_calendar);refresh(c,m,WidgetProviders.BatteryNeon.class,R.layout.widget_battery);refresh(c,m,WidgetProviders.Glass.class,R.layout.widget_glass);refresh(c,m,WidgetProviders.Minimal.class,R.layout.widget_minimal);}
+ static void refresh(Context c,AppWidgetManager m,Class<?> p,int l){int[] ids=m.getAppWidgetIds(new ComponentName(c,p));if(ids!=null&&ids.length>0)update(c,m,ids,l);}
+}
